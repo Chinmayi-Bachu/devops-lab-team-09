@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reading Progress Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📖 Reading Progress Tracker</h1>
+
+    <label for="totalPages">Total Pages:</label>
+    <input type="number" id="totalPages" placeholder="Enter total pages" />
+
+    <label for="currentPage">Current Page:</label>
+    <input type="number" id="currentPage" placeholder="Enter current page" />
+
+    <div class="progress-container">
+      <div id="progressBar"></div>
+    </div>
+
+    <p id="result">Progress: 0%</p>
+
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <!-- JavaScript added in Feature Branch 02 -->
+  <script>
+    // Get input and UI elements
+    const totalPagesInput = document.getElementById("totalPages");
+    const currentPageInput = document.getElementById("currentPage");
+    const progressBar = document.getElementById("progressBar");
+    const result = document.getElementById("result");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // Function to calculate reading progress
+    function calculateProgress() {
+      const totalPages = parseInt(totalPagesInput.value);
+      const currentPage = parseInt(currentPageInput.value);
+
+      // Basic input validation
+      if (!totalPages || totalPages <= 0) {
+        result.textContent = "Please enter a valid total page number.";
+        progressBar.style.width = "0%";
+        return;
+      }
+
+      if (currentPage < 0 || currentPage > totalPages) {
+        result.textContent = "Invalid current page.";
+        return;
+      }
+
+      // Calculate percentage
+      const progress = (currentPage / totalPages) * 100;
+
+      // Update result text and progress bar width
+      result.textContent = `Progress: ${progress.toFixed(2)}%`;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // Event listeners for dynamic calculation
+    totalPagesInput.addEventListener("input", calculateProgress);
+    currentPageInput.addEventListener("input", calculateProgress);
+
+    // Reset functionality
+    resetBtn.addEventListener("click", () => {
+      totalPagesInput.value = "";
+      currentPageInput.value = "";
+      progressBar.style.width = "0%";
+      result.textContent = "Progress: 0%";
+    });
+  </script>
+</body>
+</html>
