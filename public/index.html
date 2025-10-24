@@ -1,174 +1,63 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Reading Progress Tracker</title>
-  <meta name="description" content="A minimal reading progress calculator."/>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@400;600&display=swap');
+// CHANGE 1: Replace computeAndUpdate function
+// Find: function computeAndUpdate(){ ... }
+function computeAndUpdate(){
+  const total = Number(totalEl.value);
+  const current = Number(currentEl.value);
 
-    :root{
-      --bg:#f7f3ef;
-      --card:#fffaf5;
-      --muted:#6b5f58;
-      --accent:#8b5e34;
-      --max-width:720px;
-    }
-    *{box-sizing:border-box;}
-    html,body{height:100%;}
-    body{
-      margin:0;
-      font-family:'Inter', system-ui, sans-serif;
-      background: linear-gradient(180deg, #f9f6f2 0%, #f2e9e1 100%);
-      color:#3d2b1f;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
-      -webkit-font-smoothing:antialiased;
-      line-height:1.45;
-    }
+  // Enhanced validation with detailed error messages
+  if (!totalEl.value || !currentEl.value){
+    setMessage('📝 Please fill in both fields to calculate progress.', true);
+    return;
+  }
+  if (!Number.isFinite(total) || !Number.isFinite(current)){
+    setMessage('⚠️ Please enter valid numbers only.', true);
+    return;
+  }
+  if (total < 1){
+    setMessage('📖 Total pages must be at least 1.', true);
+    return;
+  }
+  if (current < 0){
+    setMessage('⚠️ Current page cannot be negative.', true);
+    return;
+  }
+  if (current > total){
+    setMessage('⚠️ Current page cannot exceed total pages.', true);
+    // Auto-correct: cap current at total
+    currentEl.value = total;
+    return;
+  }
+  
+  // Calculate remaining pages
+  const remaining = total - current;
+  updateProgressUI(total, current, remaining);
+}
 
-    .card{
-      width:100%;
-      max-width:var(--max-width);
-      background:var(--card);
-      border-radius:16px;
-      padding:28px;
-      box-shadow:0 8px 30px rgba(102,80,56,0.15);
-      border:1px solid rgba(0,0,0,0.05);
-    }
+// CHANGE 2: Update updateProgressUI signature
+// Find: function updateProgressUI(total, current){
+function updateProgressUI(total, current, remaining){
+  if (total <= 0) {
+    percentLabel.textContent = '0%';
+    fillEl.style.width = '0%';
+    fillEl.className = 'progress-fill';
+    pageSummaryEl.textContent = '0 / 0';
+    return;
+  }
+  let raw = (current / total) * 100;
+  let pct = clamp(Math.round(raw * 10)/10, 0, 100);
+  percentLabel.textContent = pct + '%';
+  fillEl.style.width = pct + '%';
+  pageSummaryEl.textContent = `${current} / ${total} (${remaining} left)`;
 
-    header{
-      margin-bottom:20px;
-      text-align:center;
-    }
-    h1{
-      margin:0;
-      font-family:'Merriweather', serif;
-      font-size:34px;
-      font-weight:700;
-      color:var(--accent);
-      letter-spacing:-0.5px;
-    }
-    p.lead{
-      margin:8px 0 0;
-      color:var(--muted);
-      font-size:15px;
-      font-style:italic;
-    }
+  fillEl.classList.remove('low','mid','high');
+  if (pct < 25) fillEl.classList.add('low');
+  else if (pct < 75) fillEl.classList.add('mid');
+  else fillEl.classList.add('high');
 
-    form{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      align-items:end;
-      margin-bottom:22px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-    }
-    label{
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:6px;
-      font-weight:500;
-    }
-    input[type="number"]{
-      -moz-appearance: textfield;
-      appearance: none;
-      outline: none;
-      border-radius:10px;
-      padding:10px 12px;
-      background:#fefcf9;
-      border:1px solid #d7ccc0;
-      color:#3d2b1f;
-      font-size:15px;
-      transition: all 0.2s ease;
-      font-family:'Merriweather', serif;
-    }
-    input:focus{
-      border-color:var(--accent);
-      box-shadow:0 0 0 2px rgba(139,94,52,0.2);
-    }
-
-    .progress-info{
-      text-align:center;
-      font-size:18px;
-      font-weight:600;
-      color:#3d2b1f;
-    }
-
-    .page-summary{
-      text-align:center;
-      color:var(--muted);
-      margin-top:8px;
-      font-size:14px;
-    }
-
-    @media (max-width:560px){
-      form{ grid-template-columns:1fr; }
-      h1{ font-size:28px; }
-    }
-  </style>
-</head>
-<body>
-  <main class="card" role="application" aria-labelledby="app-title">
-    <header>
-      <h1 id="app-title">Reading Progress Tracker</h1>
-      <p class="lead">Track your reading progress — simple and clear.</p>
-    </header>
-
-    <form id="tracker-form" autocomplete="off" novalidate>
-      <div class="field">
-        <label for="totalPages">Total pages</label>
-        <input id="totalPages" type="number" min="1" inputmode="numeric" step="1" required />
-      </div>
-
-      <div class="field">
-        <label for="currentPage">Current page</label>
-        <input id="currentPage" type="number" min="0" inputmode="numeric" step="1" required />
-      </div>
-    </form>
-
-    <div class="progress-info" id="percentLabel">Progress: 0%</div>
-    <div class="page-summary" id="pageSummary">0 / 0 pages</div>
-  </main>
-
-  <script>
-    (function(){
-      const totalEl = document.getElementById('totalPages');
-      const currentEl = document.getElementById('currentPage');
-      const percentLabel = document.getElementById('percentLabel');
-      const pageSummaryEl = document.getElementById('pageSummary');
-
-      function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
-
-      function updateProgress(total, current){
-        if (total <= 0){
-          percentLabel.textContent = 'Progress: 0%';
-          pageSummaryEl.textContent = '0 / 0 pages';
-          return;
-        }
-        const pct = clamp(((current / total) * 100).toFixed(1), 0, 100);
-        percentLabel.textContent = `Progress: ${pct}%`;
-        pageSummaryEl.textContent = `${current} / ${total} pages`;
-      }
-
-      function compute(){
-        const total = Number(totalEl.value);
-        const current = Number(currentEl.value);
-        if (!Number.isFinite(total) || !Number.isFinite(current)) return;
-        if (total < 1 || current < 0 || current > total) return;
-        updateProgress(total, current);
-      }
-
-      totalEl.addEventListener('input', compute);
-      currentEl.addEventListener('input', compute);
-    })();
-  </script>
-</body>
-</html>
+  // Enhanced messages with page estimates
+  if (pct === 100) setMessage("📚 Completed! Time for tea and reflection.", false);
+  else if (pct >= 75) setMessage(`📖 Almost there — ${remaining} pages to go!`, false);
+  else if (pct >= 50) setMessage(`📚 Halfway mark — ${remaining} pages remaining.`, false);
+  else if (pct > 0) setMessage(`📝 ${remaining} pages ahead — enjoy the journey!`, false);
+  else setMessage("🌟 Ready to begin — let the story unfold!", false);
+}
