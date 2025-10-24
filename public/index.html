@@ -1,319 +1,119 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Reading Progress Tracker</title>
-  <meta name="description" content="A cozy, bookish reading progress tracker for keeping pace with your current read."/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Puzzle Portal</title>
+  <meta name="description" content="Sharpen your mind with riddles and brain teasers at Puzzle Portal!" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Merriweather:wght@700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@400;600&display=swap');
-
-    :root{
-      --bg:#f7f3ef;
-      --card:#fffaf5;
-      --muted:#6b5f58;
-      --accent:#8b5e34;
-      --accent-soft:#c49b6a;
-      --success:#5f8d4e;
-      --danger:#c94b41;
-      --max-width:720px;
-    }
-    *{box-sizing:border-box;}
-    html,body{height:100%;}
-    body{
-      margin:0;
-      font-family:'Inter', system-ui, sans-serif;
-      background: radial-gradient(800px 500px at 30% 20%, rgba(203,162,107,0.15), transparent 50%),
-                  linear-gradient(180deg, #f9f6f2 0%, #f2e9e1 100%);
-      color:#3d2b1f;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
-      -webkit-font-smoothing:antialiased;
-      line-height:1.45;
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f3ec78, #af4261);
+      --card-bg: rgba(255,255,255,0.9);
+      --text-color: #2b2b2b;
+      --accent: #af4261;
+      --hover: #f3ec78;
+      --radius: 14px;
     }
 
-    .card{
-      width:100%;
-      max-width:var(--max-width);
-      background:var(--card);
-      border-radius:16px;
-      padding:28px;
-      box-shadow:0 8px 30px rgba(102,80,56,0.15);
-      border:1px solid rgba(0,0,0,0.05);
-      backdrop-filter: blur(3px);
+    * {
+      box-sizing: border-box;
     }
 
-    header{
-      margin-bottom:20px;
-      text-align:center;
-    }
-    h1{
-      margin:0;
-      font-family:'Merriweather', serif;
-      font-size:34px;
-      font-weight:700;
-      color:var(--accent);
-      letter-spacing:-0.5px;
-    }
-    p.lead{
-      margin:8px 0 0;
-      color:var(--muted);
-      font-size:15px;
-      font-style:italic;
+    body {
+      margin: 0;
+      font-family: 'Poppins', system-ui, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
     }
 
-    .book-info-tabs{
-      display:flex;
-      gap:8px;
-      justify-content:center;
-      margin-top:16px;
-    }
-    .tab-btn{
-      padding:8px 16px;
-      border:1px solid #d7ccc0;
-      background:transparent;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:13px;
-      color:var(--muted);
-      transition:all 0.2s ease;
-      font-family:'Inter', sans-serif;
-    }
-    .tab-btn.active{
-      background:var(--accent);
-      color:white;
-      border-color:var(--accent);
-    }
-    .tab-btn:hover:not(.active){
-      background:#fefcf9;
+    main {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 40px 50px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      backdrop-filter: blur(6px);
     }
 
-    form{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      align-items:end;
-      margin-bottom:22px;
+    h1 {
+      font-family: 'Merriweather', serif;
+      font-size: 2.4rem;
+      color: var(--accent);
+      margin-bottom: 10px;
     }
 
-    .field{
-      display:flex;
-      flex-direction:column;
-    }
-    label{
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:6px;
-      font-weight:500;
-    }
-    input[type="number"]{
-      -moz-appearance: textfield;
-      appearance: none;
-      outline: none;
-      border-radius:10px;
-      padding:10px 12px;
-      background:#fefcf9;
-      border:1px solid #d7ccc0;
-      color:#3d2b1f;
-      font-size:15px;
-      transition: all 0.2s ease;
-      font-family:'Merriweather', serif;
-    }
-    input:focus{
-      border-color:var(--accent);
-      box-shadow:0 0 0 2px rgba(139,94,52,0.2);
-    }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
-    .progress-wrap{
-      margin-top:6px;
-    }
-    .progress-label-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:8px;
-    }
-    .percentage{
-      font-weight:600;
-      font-size:20px;
-      color:#3d2b1f;
-    }
-    .progress-bar{
-      width:100%;
-      height:20px;
-      background:#e9dfd4;
-      border-radius:999px;
-      overflow:hidden;
-    }
-    .progress-fill{
-      height:100%;
-      width:0%;
-      transition: width 600ms cubic-bezier(.2,.9,.2,1);
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      padding-right:8px;
-      color:#fff;
-      font-size:12px;
-      font-weight:700;
-      border-radius:999px;
-      background:linear-gradient(90deg, #c49b6a, #8b5e34);
-      min-width:6%;
-      box-shadow:inset 0 -2px 4px rgba(0,0,0,0.15);
+    p {
+      font-size: 1.05rem;
+      color: #444;
+      margin-bottom: 32px;
     }
 
-    .status{
-      margin-top:14px;
-      color:var(--muted);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      color: #333;
     }
 
-    .msg{
-      font-size:14px;
-      padding:10px 12px;
-      border-radius:10px;
-      background:#f3ede7;
-      color:var(--muted);
-      min-height:44px;
-      display:flex;
-      align-items:center;
-      gap:10px;
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
-    /* Colors by progress */
-    .progress-fill.low{ background: linear-gradient(90deg, #c94b41, #d38d45); }
-    .progress-fill.mid{ background: linear-gradient(90deg, #d38d45, #8b5e34); }
-    .progress-fill.high{ background: linear-gradient(90deg, #5f8d4e, #8b5e34); }
-
-    @media (max-width:560px){
-      form{ grid-template-columns:1fr; }
-      h1{ font-size:28px; }
-      .book-info-tabs{flex-direction:column;}
-      .tab-btn{width:100%;}
+    a {
+      display: block;
+      text-decoration: none;
+      background: #fff;
+      color: var(--accent);
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+      border: 2px solid var(--accent);
     }
 
+    a:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(175,66,97,0.3);
+    }
+
+    @media (max-width: 480px) {
+      main {
+        padding: 28px 24px;
+      }
+      h1 {
+        font-size: 1.9rem;
+      }
+      p {
+        font-size: 0.95rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <main class="card" role="application" aria-labelledby="app-title">
-    <header>
-      <h1 id="app-title">Reading Progress Tracker</h1>
-      <p class="lead">Track your literary adventures — one cozy page at a time.</p>
-      <div class="book-info-tabs">
-        <button class="tab-btn active" data-tab="track">Track Progress</button>
-        <button class="tab-btn" data-tab="stats">Statistics</button>
-      </div>
-    </header>
+  <main>
+    <h1>🧩 Welcome to Puzzle Portal</h1>
+    <p>Sharpen your mind with riddles and brain teasers. Explore, think, and solve!</p>
 
-    <form id="tracker-form" autocomplete="off" novalidate>
-      <div class="field">
-        <label for="totalPages">Total pages</label>
-        <input id="totalPages" type="number" min="1" inputmode="numeric" step="1" required />
-      </div>
-
-      <div class="field">
-        <label for="currentPage">Current page</label>
-        <input id="currentPage" type="number" min="0" inputmode="numeric" step="1" required />
-      </div>
-    </form>
-
-    <div class="progress-wrap" aria-live="polite">
-      <div class="progress-label-row">
-        <div style="color:var(--muted);font-size:14px">Reading progress</div>
-        <div class="percentage" id="percentLabel">0%</div>
-      </div>
-
-      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="progress-fill" id="progressFill" style="width:0%"> </div>
-      </div>
-
-      <div class="status">
-        <div class="msg" id="message">Welcome — enter your book details to begin tracking.</div>
-        <div style="min-width:145px;text-align:right;font-size:13px" id="pageSummary">0 / 0</div>
-      </div>
-    </div>
+    <h2>Navigation</h2>
+    <ul>
+      <li><a href="puzzles.html">🧠 View Puzzles</a></li>
+      <li><a href="answers.html">✅ See Answers</a></li>
+      <li><a href="contact.html">📬 Submit a Puzzle</a></li>
+    </ul>
   </main>
-
-  <script>
-    (function(){
-      const totalEl = document.getElementById('totalPages');
-      const currentEl = document.getElementById('currentPage');
-      const percentLabel = document.getElementById('percentLabel');
-      const fillEl = document.getElementById('progressFill');
-      const messageEl = document.getElementById('message');
-      const pageSummaryEl = document.getElementById('pageSummary');
-
-      function clamp(val, min, max){ return Math.max(min, Math.min(max, val)); }
-
-      function setMessage(text, isError){
-        messageEl.textContent = text;
-        messageEl.style.color = isError ? 'var(--danger)' : 'var(--muted)';
-      }
-
-      function updateProgressUI(total, current){
-        if (total <= 0) {
-          percentLabel.textContent = '0%';
-          fillEl.style.width = '0%';
-          fillEl.className = 'progress-fill';
-          pageSummaryEl.textContent = '0 / 0';
-          return;
-        }
-        let raw = (current / total) * 100;
-        let pct = clamp(Math.round(raw * 10)/10, 0, 100);
-        percentLabel.textContent = pct + '%';
-        fillEl.style.width = pct + '%';
-        pageSummaryEl.textContent = `${current} / ${total}`;
-
-        fillEl.classList.remove('low','mid','high');
-        if (pct < 25) fillEl.classList.add('low');
-        else if (pct < 75) fillEl.classList.add('mid');
-        else fillEl.classList.add('high');
-
-        if (pct === 100) setMessage("📚 You've finished the book — time for tea and reflection!", false);
-        else if (pct >= 75) setMessage("Almost there — savor the final chapters.", false);
-        else if (pct >= 50) setMessage("Halfway through — the story deepens.", false);
-        else if (pct > 0) setMessage("A gentle start — enjoy each page.", false);
-        else setMessage("You're at the beginning — let the story unfold!", false);
-      }
-
-      function computeAndUpdate(){
-        const total = Number(totalEl.value);
-        const current = Number(currentEl.value);
-
-        if (!Number.isFinite(total) || !Number.isFinite(current)){
-          setMessage('Please enter valid numbers.', true);
-          return;
-        }
-        if (total < 1){
-          setMessage('Total pages must be ≥ 1.', true);
-          return;
-        }
-        if (current < 0 || current > total){
-          setMessage('Current page must be between 0 and total pages.', true);
-          return;
-        }
-        updateProgressUI(total, current);
-      }
-
-      totalEl.addEventListener('input', computeAndUpdate);
-      currentEl.addEventListener('input', computeAndUpdate);
-
-      // Tab functionality
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function(){
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          // Future: Add tab switching logic here
-        });
-      });
-    })();
-  </script>
 </body>
 </html>
